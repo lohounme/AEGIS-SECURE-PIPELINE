@@ -1,0 +1,19 @@
+rules:
+  - id: aegis-sqli-template-literal
+    patterns:
+      - pattern: pool.query(`...${$VAR}...`)
+    message: "❌ [AEGIS SAST] SQL Injection detected! Concaténation directe dans pool.query() interdite. Utilise une requête paramétrée avec $1."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      owasp: "A03:2021 - Injection"
+      cwe: "CWE-89"
+
+  - id: aegis-sensitive-env-leak
+    patterns:
+      - pattern: "res.json({ ..., dbPassword: $ENV, ... })"
+    message: "❌ [AEGIS SAST] Fuite de mot de passe DB détectée dans la réponse res.json() !"
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      owasp: "A01:2021 - Broken Access Control"

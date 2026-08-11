@@ -54,6 +54,24 @@ app.get('/api/v1/incidents', async (req, res) => {
   }
 });
 
+// ✅ VERSION SÉCURISÉE : Requête paramétrée contre les injections SQL (OWASP A03)
+app.get('/api/v1/incidents/search', async (req, res) => {
+  const { title } = req.query;
+  if (!title) {
+    return res.status(400).json({ error: 'Title query parameter is required' });
+  }
+  
+  // Utilisation de $1 pour neutraliser tout code SQL malveillant
+  const query = 'SELECT * FROM incidents WHERE title = $1';
+  try {
+    const result = await pool.query(query, [title]);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Initialisation des tables au démarrage si nécessaire
 async function initDB() {
   try {
