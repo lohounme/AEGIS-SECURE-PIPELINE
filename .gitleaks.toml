@@ -1,0 +1,14 @@
+title = "AEGIS Custom Gitleaks Rules"
+
+[allowlist]
+description = "Global allowlist for benign examples"
+paths = [
+  '''\.env\.example$''',
+  '''docker/docker-compose\.yml$'''
+]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key Leak Detection"
+regex = '''(?i)(api_key|apikey|secret_key|app_secret)\s*[:=]\s*["']([0-9a-zA-Z]{16,})["']'''
+tags = ["key", "generic", "secret"]
