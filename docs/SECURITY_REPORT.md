@@ -53,12 +53,15 @@
 
 ## 📄 3. Registre des Risques Acceptés (`.trivyignore`)
 
-Certaines failles système amont au niveau d'Alpine Linux ont été analysées et jugées acceptables :
+Toutes les failles amont ignorées dans `.trivyignore` font l'objet d'une analyse d'impact stricte et d'une justification formelle :
 
-| CVE ID | Composant | Sévérité | Justification d'Acceptation du Risque |
+| CVE ID | Composant | Sévérité | Justification d'Acceptation du Risque & Analyse d'Impact |
 | :--- | :--- | :--- | :--- |
-| `CVE-2026-45447` | `libcrypto3` / OpenSSL | HIGH | Faille amont dans la vérification PKCS7. Notre API REST Express n'utilise pas cette fonction d'OpenSSL. Risque nul. En attente du correctif Alpine. |
-| `CVE-2026-59873` | `tar` | CRITICAL | Faille liée aux archives tar amont. Le conteneur s'exécute avec l'utilisateur non-root `node` et ne manipule aucune archive tar en prod. |
+| `CVE-2026-45447` | `libcrypto3` (OpenSSL) | HIGH | Faille amont dans la vérification PKCS7. Notre API Express n'utilise pas la vérification PKCS7 d'OpenSSL. Risque nul. En attente du patch Alpine. |
+| `CVE-2026-59873` | `tar` | CRITICAL | Faille de déni de service via archive tar amont. Le conteneur s'exécute sous l'utilisateur restreint non-root `node` et ne manipule aucune archive tar en prod. |
+| `CVE-2026-13149` | `brace-expansion` | HIGH | Faille de complexité algorithmique exponentielle. Ne concerne que l'outil CLI `npm` de l'image de base. L'API Express ne traite aucune expression d'accolades en prod. |
+| `CVE-2026-14257` | `brace-expansion` | HIGH | Faille d'épuisement mémoire dans `expand()`. Concerne uniquement les dépendances système internes de l'image de base. L'API utilise Express/pg sans appel direct. |
+| `CVE-2026-69152` | `brace-expansion` | HIGH | Variante de contournement ReDoS sur tableaux intermédiaires. Risque nul sur l'exécution runtime de l'API web (`node app.js`). |
 
 ---
 

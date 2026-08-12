@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
@@ -33,10 +33,10 @@ jobs:
     needs: secret-scan
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: '3.11'
 
@@ -56,10 +56,10 @@ jobs:
     needs: sast-scan
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: '20'
 
@@ -84,7 +84,7 @@ jobs:
     needs: sca-scan
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Build Docker Image
         run: |
@@ -95,7 +95,7 @@ jobs:
         with:
           image-ref: 'aegis-app:${{ github.sha }}'
           format: 'table'
-          exit-code: '1' # Bloque le pipeline si vulnérabilité critique trouvée
+          exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL'
