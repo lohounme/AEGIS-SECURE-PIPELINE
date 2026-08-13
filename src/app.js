@@ -53,7 +53,7 @@ app.get('/api/v1/incidents', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 // ✅ VERSION SÉCURISÉE : Requête paramétrée contre les injections SQL (OWASP A03)
 app.get('/api/v1/incidents/search', async (req, res) => {
   const { title } = req.query;

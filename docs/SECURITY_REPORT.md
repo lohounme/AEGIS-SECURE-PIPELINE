@@ -51,17 +51,17 @@
 
 ---
 
-## 📄 3. Registre des Risques Acceptés (`.trivyignore`)
+## 📄 3. Registre des Risques Acceptés & Remédiation Avancée (`.trivyignore`)
 
-Toutes les failles amont ignorées dans `.trivyignore` font l'objet d'une analyse d'impact stricte et d'une justification formelle :
+Initialement triées et documentées dans `.trivyignore`, les vulnérabilités amont d'Alpine (`CVE-2026-45447`, `CVE-2026-59873`, etc.) ont été **définitivement éliminées** grâce à la PR automatique Snyk mettant à niveau l'image de base vers `node:26.7.0-alpine`.
 
-| CVE ID | Composant | Sévérité | Justification d'Acceptation du Risque & Analyse d'Impact |
-| :--- | :--- | :--- | :--- |
-| `CVE-2026-45447` | `libcrypto3` (OpenSSL) | HIGH | Faille amont dans la vérification PKCS7. Notre API Express n'utilise pas la vérification PKCS7 d'OpenSSL. Risque nul. En attente du patch Alpine. |
-| `CVE-2026-59873` | `tar` | CRITICAL | Faille de déni de service via archive tar amont. Le conteneur s'exécute sous l'utilisateur restreint non-root `node` et ne manipule aucune archive tar en prod. |
-| `CVE-2026-13149` | `brace-expansion` | HIGH | Faille de complexité algorithmique exponentielle. Ne concerne que l'outil CLI `npm` de l'image de base. L'API Express ne traite aucune expression d'accolades en prod. |
-| `CVE-2026-14257` | `brace-expansion` | HIGH | Faille d'épuisement mémoire dans `expand()`. Concerne uniquement les dépendances système internes de l'image de base. L'API utilise Express/pg sans appel direct. |
-| `CVE-2026-69152` | `brace-expansion` | HIGH | Variante de contournement ReDoS sur tableaux intermédiaires. Risque nul sur l'exécution runtime de l'API web (`node app.js`). |
+| CVE ID | Composant | Sévérité | Statut Final | Action de Remédiation Appliquée |
+| :--- | :--- | :--- | :--- | :--- |
+| `CVE-2026-45447` | `libcrypto3` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
+| `CVE-2026-59873` | `tar` | CRITICAL | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
+| `CVE-2026-13149` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
+| `CVE-2026-14257` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
+| `CVE-2026-69152` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
 
 ---
 
