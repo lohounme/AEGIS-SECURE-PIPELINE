@@ -1,7 +1,7 @@
 # ----------------------------------------------------
 # Stage 1: Build & Install dependencies
 # ----------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:26.7.0-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -13,7 +13,7 @@ RUN npm ci --only=production
 # ----------------------------------------------------
 # Stage 2: Hardened Runtime Image
 # ----------------------------------------------------
-FROM node:20-alpine
+FROM node:26.7.0-alpine
 
 # Bonne pratique : Node environment en production
 ENV NODE_ENV=production
