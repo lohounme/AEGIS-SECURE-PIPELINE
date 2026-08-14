@@ -1,5 +1,6 @@
 name: AEGIS DevSecOps Pipeline
 
+# Déclencheurs : chaque push ou PR sur main active le pipeline
 on:
   push:
     branches: [ "main" ]
@@ -61,7 +62,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4.2.0
         with:
-          node-version: '20'
+          node-version: '20' # LTS stable — aligné avec l'image de build Docker
 
       - name: Install Dependencies
         run: |
@@ -91,11 +92,12 @@ jobs:
           docker build -t aegis-app:${{ github.sha }} -f docker/Dockerfile .
 
       - name: Run Trivy Container Vulnerability Scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.31.0
         with:
           image-ref: 'aegis-app:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
+          exit-code: '1'           # Blocage strict si CRITICAL détecté
+          ignore-unfixed: true      # Ignorer si aucun patch disponible
+          trivyignores: '.trivyignore' # Registre de risques acceptés & justifiés
           vuln-type: 'os,library'
-          severity: 'CRITICAL'
+          severity: 'CRITICAL,HIGH' # Bloquer sur CRITICAL et HIGH

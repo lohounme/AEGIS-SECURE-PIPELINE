@@ -1,7 +1,15 @@
-# AEGIS Security Triage - Accepted Base Image Vulnerabilities
-# Justification: OpenSSL/libcrypto3 vulnerability in Alpine base image, awaiting upstream patch.
-CVE-2026-45447
-CVE-2026-59873
-CVE-2026-13149
-CVE-2026-14257
-CVE-2026-69152
+# =============================================================
+# AEGIS Security Triage — Registre des Risques Acceptés
+# =============================================================
+
+# =============================================================
+# STATUT ACTUEL : AUCUNE EXCEPTION ACTIVE
+# =============================================================
+# Les vulnérabilités initialement triées dans node:20-alpine
+# (CVE-2026-45447, CVE-2026-59873, CVE-2026-13149, CVE-2026-14257,
+# CVE-2026-69152) ont été DÉFINITIVEMENT ÉLIMINÉES le 2026-08-13
+# via la mise à niveau de l'image de base vers node:26.7.0-alpine
+# (Snyk Automated Fix PR #1).
+#
+# Référence : docs/SECURITY_REPORT.md — Section 3
+# =============================================================

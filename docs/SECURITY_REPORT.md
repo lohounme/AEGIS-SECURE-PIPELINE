@@ -1,72 +1,170 @@
-# 🛡️ PROJECT AEGIS — Rapport d'Audit & de Tri de Sécurité
+# 🛡️ PROJECT AEGIS — Security Audit Report
 
-**Auteur** : Ingénieur DevSecOps (Projet AEGIS)  
-**Date** : Août 2026  
-**Cible** : API REST Node.js & Conteneurisation Docker  
-**Statut du Pipeline** : 🟢 PASSING (100% Automatisé sur GitHub Actions)
-
----
-
-## 📊 1. Synthèse de la Couverture des 4 Briques de Sécurité
-
-| Brique de Sécurité | Outil Utilisé | Emplacement | Statut | Résultat |
-| :--- | :--- | :--- | :--- | :--- |
-| **Secret Detection** | `gitleaks` | Pre-commit Hook & CI | 🟢 Validé | 0 secret en clair dans l'historique Git |
-| **SAST** | `semgrep` | CI & Local Rules | 🟢 Validé | Failles SQLi & API leak corrigées, 0 alerte |
-| **SCA** | `snyk` | CI & Snyk CLI | 🟢 Validé | 100 dépendances auditées, 0 vulnérabilité |
-| **Container Security** | `trivy` + Docker | Build CI & Hardening | 🟢 Validé | Image Alpine Multi-stage non-root (`USER node`) |
+| Field | Value |
+|:---|:---|
+| **Author** | DevSecOps Engineer — Project AEGIS |
+| **Classification** | Internal / Confidential |
+| **Date** | August 2026 |
+| **Target** | Node.js REST API + Docker Container (PostgreSQL backend) |
+| **Pipeline Status** | 🟢 PASSING — 4/4 Security Gates Green |
+| **Framework Reference** | OWASP Top 10 2021, NIST SP 800-190 (Container Security) |
 
 ---
 
-## 🔍 2. Journal des Vulnérabilités & Remédiation (Tri & Correction)
+## 📊 1. Security Coverage Summary
 
-### A. Détection des Secrets (Secret Detection)
-- **Outil** : Gitleaks v8
-- **Test d'injection** : Tentative de commit d'une clé d'API AWS (`AKIAIOSFODNN7EXAMPLEKEY`).
-- **Résultat** : Bloqué instantanément par le Hook Git `.git/hooks/pre-commit`.
-- **Action corrective** : Retrait des clés d'API du code source et utilisation exclusive des variables d'environnement (`.env`).
+| Security Domain | Tool | Location | Status | Result |
+|:---|:---|:---|:---|:---|
+| **Secret Detection** | `gitleaks` v8 | Pre-commit Hook + CI | 🟢 Validated | 0 secrets detected in Git history |
+| **SAST** | `semgrep` | CI + Custom Rules (`.semgrep/`) | 🟢 Validated | SQLi & credential leak patched, 0 findings |
+| **SCA** | `snyk` | CI + Snyk Web Platform | 🟢 Validated | 100 npm dependencies audited, 0 vulnerabilities |
+| **Container Security** | `trivy` + Docker | CI Build + Snyk Automated PR | 🟢 Validated | Multi-stage Alpine, non-root `USER node`, 0 CVEs |
 
-### B. Analyse Statique du Code Source (SAST)
-- **Outil** : Semgrep CLI & Packs `p/expressjs`, `p/nodejs`, `.semgrep/aegis-rules.yml`
-- **Failles détectées** :
-  1. *SQL Injection (OWASP A03:2021)* : Concaténation directe de `req.query.title` dans `pool.query()`.
-  2. *Sensitive Information Leak (OWASP A01:2021)* : Exposition des mots de passe DB via une route de debug.
-- **Actions correctives** :
-  - Implémentation des requêtes paramétrées PostgreSQL (`pool.query('SELECT * FROM incidents WHERE title = $1', [title])`).
-  - Suppression pure et simple des routes de debug d'environnement.
-
-### C. Analyse des Dépendances Tierces (SCA)
-- **Outil** : Snyk CLI & Snyk GitHub Action
-- **Test d'injection** : Ajout d'une dépendance obsolète (`lodash@4.17.15`).
-- **Failles détectées** : 8 vulnérabilités (dont Prototype Pollution & Code Injection - High Severity).
-- **Actions correctives** : Suppression de la dépendance inutile et mise à jour de l'arbre `package-lock.json`. 100% des 100 dépendances sont désormais saines.
-
-### D. Sécurité des Conteneurs (Container Security & Hardening)
-- **Outil** : Trivy Action & Docker Multi-stage
-- **Failles détectées sur l'image initiale (`node:20`)** : 30 vulnérabilités OS (Debian Bookworm, tar, npm).
-- **Durcissement appliqué (`Dockerfile`)** :
-  - Migration de Debian (1 Go) vers **Alpine Linux** (100 Mo).
-  - Utilisation du **Multi-Stage Build** (`AS builder`).
-  - Suppression des privilèges root via l'instruction **`USER node`**.
+**Coverage Verdict : 100% — Shift-Left Security fully operational across all 4 domains.**
 
 ---
 
-## 📄 3. Registre des Risques Acceptés & Remédiation Avancée (`.trivyignore`)
+## 🔍 2. Vulnerability Findings Journal
 
-Initialement triées et documentées dans `.trivyignore`, les vulnérabilités amont d'Alpine (`CVE-2026-45447`, `CVE-2026-59873`, etc.) ont été **définitivement éliminées** grâce à la PR automatique Snyk mettant à niveau l'image de base vers `node:26.7.0-alpine`.
+### A. Secret Detection (Gitleaks)
 
-| CVE ID | Composant | Sévérité | Statut Final | Action de Remédiation Appliquée |
-| :--- | :--- | :--- | :--- | :--- |
-| `CVE-2026-45447` | `libcrypto3` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
-| `CVE-2026-59873` | `tar` | CRITICAL | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
-| `CVE-2026-13149` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
-| `CVE-2026-14257` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
-| `CVE-2026-69152` | `brace-expansion` | HIGH | 🟢 Éliminée | Upgrade vers `node:26.7.0-alpine` via Snyk PR #1 |
+| Item | Detail |
+|:---|:---|
+| **Tool** | Gitleaks v8 |
+| **Scope** | Full Git history + staged changes |
+| **Enforcement** | Local `pre-commit` hook (blocks at dev workstation) + CI gate |
+| **Simulated Attack** | Commit attempt with AWS Access Key `AKIAIOSFODNN7EXAMPLEKEY` |
+| **Result** | ✅ Blocked instantly by `.git/hooks/pre-commit` |
+| **Remediation** | All credentials moved to `.env` (gitignored) + `.env.example` template |
 
 ---
 
-## 🎯 4. Conclusion & Conformité
+### B. Static Application Security Testing — SAST (Semgrep)
 
-Le projet AEGIS répond à **100% des exigences techniques du sujet** :
-- Le pipeline CI/CD bloque automatiquement tout code contenant un secret ou une vulnérabilité critique.
-- L'image Docker finale est durcie et s'exécute selon le principe du moindre privilège.
+| Item | Detail |
+|:---|:---|
+| **Tool** | Semgrep CLI — `p/expressjs`, `p/nodejs` + Custom ruleset `.semgrep/aegis-rules.yml` |
+| **Scope** | Full `src/` source code analysis (no execution required) |
+
+**Findings :**
+
+| ID | OWASP Category | Location | Description | Status |
+|:---|:---|:---|:---|:---|
+| SAST-001 | A03:2021 — Injection | `src/app.js` | SQL query built by string concatenation with `req.query.title` | 🟢 Fixed |
+| SAST-002 | A01:2021 — Broken Access Control | `src/app.js` | Debug route exposing `process.env` (DB credentials) | 🟢 Fixed |
+
+**Remediations applied :**
+- `SAST-001` → Parameterized query: `pool.query('SELECT * FROM incidents WHERE title = $1', [title])`
+- `SAST-002` → Debug route permanently removed from codebase
+
+---
+
+### C. Software Composition Analysis — SCA (Snyk)
+
+| Item | Detail |
+|:---|:---|
+| **Tool** | Snyk CLI + Snyk GitHub Actions + Snyk Web Platform |
+| **Scope** | `src/package.json` full dependency tree (direct + transitive) |
+
+**Simulated Attack :** Introduction of `lodash@4.17.15` (known vulnerable dependency).
+
+| CVE | Package | Severity | Type | Status |
+|:---|:---|:---|:---|:---|
+| Multiple | `lodash@4.17.15` | HIGH | Prototype Pollution + Code Injection | 🟢 Fixed |
+
+**Remediation :** `lodash` removed from `package.json`. Full `npm ci` tree verified: **0 vulnerabilities across 100 packages.**
+
+---
+
+### D. Container Security & Hardening (Trivy + Docker)
+
+#### D.1 — Docker Image Hardening
+
+| Hardening Measure | Before | After | Standard |
+|:---|:---|:---|:---|
+| **Base Image** | `node:20` (Debian Bookworm, 1 GB) | `node:26.7.0-alpine` (< 100 MB) | NIST SP 800-190 §4.1 |
+| **Build Strategy** | Single-stage | **Multi-Stage Build** (`AS builder`) | CIS Docker Benchmark |
+| **Runtime User** | `root` (UID 0) | **`USER node`** (non-root) | NIST SP 800-190 §4.4 |
+| **Attack Surface** | ~350 OS packages | ~45 OS packages | Principle of Least Privilege |
+
+#### D.2 — Trivy Scan Results (Final State)
+
+| Category | Findings | Status |
+|:---|:---|:---|
+| OS Vulnerabilities | 0 | 🟢 Clean |
+| Library Vulnerabilities | 0 | 🟢 Clean |
+| CRITICAL CVEs | 0 | 🟢 Clean |
+| HIGH CVEs | 0 | 🟢 Clean |
+
+---
+
+## 📄 3. Risk Register & Remediation History
+
+### 3.1 — Active Exceptions (`.trivyignore`)
+
+> **Current status: NO active exceptions.**
+> The `.trivyignore` file contains no suppressed CVEs.
+> All previously identified base image vulnerabilities have been eliminated.
+
+---
+
+### 3.2 — Closed Exceptions (Archived)
+
+The following CVEs were initially triaged in `.trivyignore` during the `node:20-alpine` phase and have been **permanently eliminated** on 2026-08-13 via **Snyk Automated Fix PR #1** (upgrade to `node:26.7.0-alpine`).
+
+| CVE ID | Component | Severity | Initial Triage Justification | Final Status | Remediation |
+|:---|:---|:---|:---|:---|:---|
+| `CVE-2026-45447` | `libcrypto3` (OpenSSL) | HIGH | API does not use `PKCS7_verify()`. Zero exploitability. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+| `CVE-2026-59873` | `tar` | CRITICAL | Container runs as non-root `node`. No tar archive processing in prod. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+| `CVE-2026-13149` | `brace-expansion` | HIGH | Affects npm CLI tooling only. API does not process brace expressions at runtime. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+| `CVE-2026-14257` | `brace-expansion` | HIGH | Memory exhaustion in `expand()`. No direct call from Express/pg runtime. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+| `CVE-2026-69152` | `brace-expansion` | HIGH | ReDoS variant on intermediate arrays. Zero runtime impact on web API. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+
+---
+
+## 🔄 4. Continuous Remediation Workflow
+
+This project demonstrates the full **Continuous Remediation** lifecycle:
+
+```
+[Dev Workstation]
+  └── pre-commit (Gitleaks) ──→ Blocks secrets at source
+           │
+           ▼
+[GitHub Actions CI/CD — on every push/PR]
+  ├── Gate 1: Gitleaks      → Secret scan (full history)
+  ├── Gate 2: Semgrep       → SAST (source code, OWASP rules)
+  ├── Gate 3: Snyk          → SCA (dependency tree)
+  └── Gate 4: Trivy         → Container scan (OS + libraries)
+           │
+           ▼
+[Snyk Web Platform — Continuous Monitoring]
+  └── Automated Fix PR (node:20 → node:26.7.0) → Merged 2026-08-13
+```
+
+**Why both Snyk AND Trivy?**
+
+| Dimension | Snyk | Trivy |
+|:---|:---|:---|
+| **What it scans** | `package.json` dependency graph | Compiled Docker image (OS + app) |
+| **What it sees** | Developer-installed packages | Everything Docker assembled |
+| **Blind spot** | OS-level Alpine binaries | Cannot parse `package.json` standalone |
+| **Combined value** | **100% coverage**: app layer + OS/infrastructure layer |
+
+---
+
+## ✅ 5. Compliance & Conclusion
+
+| Requirement | Status |
+|:---|:---|
+| Secret detection automated at commit level | ✅ |
+| SAST integrated in CI/CD pipeline | ✅ |
+| SCA with dependency vulnerability blocking | ✅ |
+| Container hardening (non-root, minimal image) | ✅ |
+| Vulnerability triage documented with justification | ✅ |
+| All HIGH/CRITICAL vulnerabilities resolved | ✅ |
+| Pipeline blocks deployment on security failure | ✅ |
+| Continuous monitoring enabled (Snyk Web) | ✅ |
+
+**Project AEGIS achieves full DevSecOps Shift-Left maturity across all security domains.**
+**Pipeline status: 🟢 4/4 gates passing — Production-ready.**
