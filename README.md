@@ -1,4 +1,4 @@
-# 🛡️ Project AEGIS — Enterprise DevSecOps Pipeline
+# Project AEGIS: Enterprise DevSecOps Pipeline
 
 [![AEGIS DevSecOps Pipeline](https://github.com/lohounme/AEGIS-SECURE-PIPELINE/actions/workflows/aegis-pipeline.yml/badge.svg)](https://github.com/lohounme/AEGIS-SECURE-PIPELINE/actions/workflows/aegis-pipeline.yml)
 ![Node.js](https://img.shields.io/badge/Node.js-26.x_LTS-339933?logo=node.js&logoColor=white)
@@ -6,7 +6,7 @@
 ![Security](https://img.shields.io/badge/Security-Shift--Left-critical?logo=shield&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
-> **Production-grade DevSecOps pipeline** demonstrating automated security gates across the full software delivery lifecycle from developer workstation to containerized deployment.
+> **Production-grade DevSecOps pipeline** demonstrating automated security gates across the full software delivery lifecycle: from developer workstation to containerized deployment.
 
 ---
 
@@ -47,7 +47,7 @@ The secured application is a **Node.js/Express REST API** backed by **PostgreSQL
 │   Gate 4 ──▶  🐳 Container Security  (Docker + Trivy)          │
 │                                                                 │
 │   Each gate blocks deployment on failure (exit-code: 1)         │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -60,7 +60,7 @@ The secured application is a **Node.js/Express REST API** backed by **PostgreSQL
 
 ## 🔐 The Four Security Domains
 
-### 1. 🔑 Secret Detection — Gitleaks
+### 1. 🔑 Secret Detection: Gitleaks
 
 **Threat prevented:** Credentials, API keys, and tokens accidentally committed to source control.
 
@@ -69,23 +69,23 @@ The secured application is a **Node.js/Express REST API** backed by **PostgreSQL
 - Custom rules configured in `.gitleaks.toml`
 
 ```bash
-# Hook installed automatically — blocks commit if secrets are detected
+# Hook installed automatically: blocks commit if secrets are detected
 bash scripts/setup-git-hooks.sh
 ```
 
 ---
 
-### 2. 🔬 Static Application Security Testing — Semgrep
+### 2. 🔬 Static Application Security Testing: Semgrep
 
 **Threat prevented:** OWASP Top 10 vulnerabilities in application source code (SQL Injection, XSS, credential leaks).
 
 - Scans `src/` against official `p/expressjs` and `p/nodejs` rule packs
 - Custom ruleset in `.semgrep/aegis-rules.yml` targeting project-specific patterns
-- **Finding patched:** SQL injection via string concatenation → replaced with parameterized query `pool.query('SELECT ... WHERE id = $1', [id])`
+- **Finding patched:** SQL injection via string concatenation -> replaced with parameterized query `pool.query('SELECT ... WHERE id = $1', [id])`
 
 ---
 
-### 3. 📦 Software Composition Analysis — Snyk
+### 3. 📦 Software Composition Analysis: Snyk
 
 **Threat prevented:** Known vulnerabilities in third-party npm dependencies (direct and transitive).
 
@@ -95,17 +95,17 @@ bash scripts/setup-git-hooks.sh
 
 ---
 
-### 4. 🐳 Container Security & Hardening — Docker + Trivy
+### 4. 🐳 Container Security & Hardening: Docker + Trivy
 
 **Threat prevented:** OS-level vulnerabilities, bloated attack surface, and root privilege escalation inside the container.
 
 | Hardening Measure | Detail |
 |:---|:---|
-| **Base Image** | `node:26.7.0-alpine` — minimal attack surface (< 100 MB vs 1 GB Debian) |
+| **Base Image** | `node:26.7.0-alpine` (minimal attack surface: < 100 MB vs 1 GB Debian) |
 | **Multi-Stage Build** | Dependencies compiled in `builder` stage; only production artifacts in runtime |
-| **Non-root User** | Container runs as `USER node` — no root privileges in production |
+| **Non-root User** | Container runs as `USER node`: no root privileges in production |
 | **Trivy Scan** | CI gate blocks on any `CRITICAL` or `HIGH` CVE at deploy time |
-| **Snyk Monitoring** | Automated base image upgrade PRs (patched `node:20` → `node:26.7.0`) |
+| **Snyk Monitoring** | Automated base image upgrade PRs (patched `node:20` -> `node:26.7.0`) |
 
 ---
 
@@ -114,10 +114,10 @@ bash scripts/setup-git-hooks.sh
 | Layer | Technology |
 |:---|:---|
 | **Application** | Node.js 20 LTS, Express.js, PostgreSQL (via `pg`) |
-| **Security — Secrets** | Gitleaks v8 |
-| **Security — SAST** | Semgrep (custom rules + OWASP packs) |
-| **Security — SCA** | Snyk Open Source |
-| **Security — Container** | Trivy, Docker Multi-Stage, Alpine Linux |
+| **Security: Secrets** | Gitleaks v8 |
+| **Security: SAST** | Semgrep (custom rules + OWASP packs) |
+| **Security: SCA** | Snyk Open Source |
+| **Security: Container** | Trivy, Docker Multi-Stage, Alpine Linux |
 | **CI/CD** | GitHub Actions |
 | **Monitoring** | Snyk Web Platform |
 | **Standards** | OWASP Top 10 2021, NIST SP 800-190, CIS Docker Benchmark |
@@ -187,7 +187,8 @@ AEGIS-SECURE-PIPELINE/
 │   └── package.json             # npm dependencies
 ├── .env.example                 # Environment variable template
 ├── .gitleaks.toml               # Secret detection rules
-└── .trivyignore                 # CVE risk register (currently empty — 0 active exceptions)
+├── .trivyignore                 # CVE risk register
+└── LICENSE                      # MIT License
 ```
 
 ---
@@ -202,4 +203,4 @@ The full vulnerability findings, remediation journal, and risk register are docu
 
 ## 📜 License
 
-MIT — See [LICENSE](LICENSE) for details.
+MIT: See [LICENSE](LICENSE) for details.
