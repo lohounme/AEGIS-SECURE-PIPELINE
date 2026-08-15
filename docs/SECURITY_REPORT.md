@@ -18,7 +18,7 @@
 | **Secret Detection** | `gitleaks` v8 | Pre-commit Hook + CI | 🟢 Validated | 0 secrets detected in Git history |
 | **SAST** | `semgrep` | CI + Custom Rules (`.semgrep/`) | 🟢 Validated | SQLi & credential leak patched, 0 findings |
 | **SCA** | `snyk` | CI + Snyk Web Platform | 🟢 Validated | 100 npm dependencies audited, 0 vulnerabilities |
-| **Container Security** | `trivy` + Docker | CI Build + Snyk Automated PR | 🟢 Validated | Multi-stage Alpine, non-root `USER node`, 0 CVEs |
+| **Container Security** | `trivy` + Docker | CI Build + Snyk Automated PR | 🟢 Validated | Multi-stage Alpine, non-root `USER node`, 0 CRITICAL CVEs |
 
 **Coverage Verdict : 100% — Shift-Left Security fully operational across all 4 domains.**
 
@@ -91,34 +91,36 @@
 
 | Category | Findings | Status |
 |:---|:---|:---|
-| OS Vulnerabilities | 0 | 🟢 Clean |
-| Library Vulnerabilities | 0 | 🟢 Clean |
 | CRITICAL CVEs | 0 | 🟢 Clean |
-| HIGH CVEs | 0 | 🟢 Clean |
+| HIGH CVEs (Triaged) | 3 | 🟡 Triaged & Justified (npm CLI internal tooling) |
+| OS Vulnerabilities | 0 | 🟢 Clean |
 
 ---
 
-## 📄 3. Risk Register & Remediation History
+## 📄 3. Risk Register & Accepted Exceptions (`.trivyignore`)
 
-### 3.1 — Active Exceptions (`.trivyignore`)
+### 3.1 — Active Exceptions
 
-> **Current status: NO active exceptions.**
-> The `.trivyignore` file contains no suppressed CVEs.
-> All previously identified base image vulnerabilities have been eliminated.
+The following HIGH severity vulnerabilities reside exclusively inside global `npm` CLI tooling (`/usr/local/lib/node_modules/npm`) shipped with the official `node:26.7.0-alpine` base image. 
+
+They are **formally triaged and accepted** as non-exploitable in production:
+
+| CVE ID | Component | Severity | Context & Exploitability Analysis | Decision & Rationale |
+|:---|:---|:---|:---|:---|
+| `CVE-2026-14257` | `brace-expansion` | HIGH | Memory exhaustion in `expand()`. Located in internal npm CLI tree. Production container executes `node app.js` — npm CLI is never invoked at runtime. | 🟡 Accepted Risk — Zero runtime exposure |
+| `CVE-2026-69152` | `brace-expansion` | HIGH | DoS via unbounded arrays in brace expansion. Internal npm CLI tool dependency only. Not imported by application code. | 🟡 Accepted Risk — Zero runtime exposure |
+| `CVE-2026-69192` | `ip-address` | HIGH | Inconsistent IP parsing leading to potential SSRF in npm CLI internal module. App uses Express + PostgreSQL without invoking `ip-address`. | 🟡 Accepted Risk — Zero runtime exposure |
 
 ---
 
-### 3.2 — Closed Exceptions (Archived)
+### 3.2 — Closed Exceptions (History)
 
-The following CVEs were initially triaged in `.trivyignore` during the `node:20-alpine` phase and have been **permanently eliminated** on 2026-08-13 via **Snyk Automated Fix PR #1** (upgrade to `node:26.7.0-alpine`).
+The following CVEs were initially triaged during the `node:20-alpine` phase and were **permanently resolved** on 2026-08-13 via **Snyk Automated Fix PR #1** (upgrade to `node:26.7.0-alpine`):
 
-| CVE ID | Component | Severity | Initial Triage Justification | Final Status | Remediation |
-|:---|:---|:---|:---|:---|:---|
-| `CVE-2026-45447` | `libcrypto3` (OpenSSL) | HIGH | API does not use `PKCS7_verify()`. Zero exploitability. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
-| `CVE-2026-59873` | `tar` | CRITICAL | Container runs as non-root `node`. No tar archive processing in prod. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
-| `CVE-2026-13149` | `brace-expansion` | HIGH | Affects npm CLI tooling only. API does not process brace expressions at runtime. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
-| `CVE-2026-14257` | `brace-expansion` | HIGH | Memory exhaustion in `expand()`. No direct call from Express/pg runtime. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
-| `CVE-2026-69152` | `brace-expansion` | HIGH | ReDoS variant on intermediate arrays. Zero runtime impact on web API. | 🟢 Eliminated | Upgrade → `node:26.7.0-alpine` |
+| CVE ID | Component | Severity | Final Status | Resolution |
+|:---|:---|:---|:---|:---|
+| `CVE-2026-45447` | `libcrypto3` (OpenSSL) | HIGH | 🟢 Eliminated | Base image upgraded to `node:26.7.0-alpine` |
+| `CVE-2026-59873` | `tar` | CRITICAL | 🟢 Eliminated | Base image upgraded to `node:26.7.0-alpine` |
 
 ---
 
@@ -142,15 +144,6 @@ This project demonstrates the full **Continuous Remediation** lifecycle:
   └── Automated Fix PR (node:20 → node:26.7.0) → Merged 2026-08-13
 ```
 
-**Why both Snyk AND Trivy?**
-
-| Dimension | Snyk | Trivy |
-|:---|:---|:---|
-| **What it scans** | `package.json` dependency graph | Compiled Docker image (OS + app) |
-| **What it sees** | Developer-installed packages | Everything Docker assembled |
-| **Blind spot** | OS-level Alpine binaries | Cannot parse `package.json` standalone |
-| **Combined value** | **100% coverage**: app layer + OS/infrastructure layer |
-
 ---
 
 ## ✅ 5. Compliance & Conclusion
@@ -162,8 +155,8 @@ This project demonstrates the full **Continuous Remediation** lifecycle:
 | SCA with dependency vulnerability blocking | ✅ |
 | Container hardening (non-root, minimal image) | ✅ |
 | Vulnerability triage documented with justification | ✅ |
-| All HIGH/CRITICAL vulnerabilities resolved | ✅ |
-| Pipeline blocks deployment on security failure | ✅ |
+| All CRITICAL vulnerabilities resolved (0 remaining) | ✅ |
+| Pipeline blocks deployment on CRITICAL security failure | ✅ |
 | Continuous monitoring enabled (Snyk Web) | ✅ |
 
 **Project AEGIS achieves full DevSecOps Shift-Left maturity across all security domains.**

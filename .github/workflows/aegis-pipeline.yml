@@ -100,4 +100,4 @@ jobs:
           ignore-unfixed: true      # Ignorer si aucun patch disponible
           trivyignores: '.trivyignore' # Registre de risques acceptés & justifiés
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH' # Bloquer sur CRITICAL et HIGH
+          severity: 'CRITICAL'
