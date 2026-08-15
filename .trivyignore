@@ -1,20 +1,20 @@
 # =============================================================
-# AEGIS Security Triage — Registre des Risques Acceptés
+# AEGIS Security Triage — Accepted Risk Register
 # =============================================================
-# Ce fichier liste les CVEs formellement analysées et leur statut.
-# Toute CVE listée ici doit avoir une justification documentée
-# dans docs/SECURITY_REPORT.md (Section 3).
+# This file lists CVEs formally analyzed and suppressed.
+# Every CVE listed here must have a documented justification
+# in docs/SECURITY_REPORT.md (Section 3).
 # =============================================================
 
-# Justification : Faille DoS via memory exhaustion dans brace-expansion.
-# Concerne le CLI global npm (/usr/local/lib/node_modules/npm) embarqué dans l'image Node.
-# Risque nul en prod : l'API s'exécute via "node app.js" (npm n'est jamais invoqué en runtime).
+# Justification: DoS via memory exhaustion in brace-expansion.
+# Affects global npm CLI (/usr/local/lib/node_modules/npm) in Node base image.
+# Zero runtime risk: production container runs "node app.js" (npm CLI is never invoked).
 CVE-2026-14257
 
-# Justification : Variante ReDoS sur tableaux intermédiaires dans brace-expansion.
-# Concerne uniquement le binaire CLI npm de l'image de base. Risque nul en runtime.
+# Justification: ReDoS variant on intermediate arrays in brace-expansion.
+# Affects internal npm CLI tooling only. Zero runtime exposure.
 CVE-2026-69152
 
-# Justification : Faille de parsing d'adresse IP (SSRF potentiel) dans ip-address.
-# Dépendance interne d'npm CLI. Notre API n'utilise pas le module ip-address.
+# Justification: Inconsistent IP parsing (potential SSRF) in ip-address.
+# Internal npm CLI dependency. App code uses Express + pg without invoking ip-address.
 CVE-2026-69192
